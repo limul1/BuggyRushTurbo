@@ -6,6 +6,7 @@ on:
       - 'BuggyRush_CPP.zip'
       - 'BuggyRush_Android_Build_Package.zip'
       - 'README.md'
+      - '.github/workflows/build-native-apk.yml'
   workflow_dispatch:
 jobs:
   build:
@@ -36,6 +37,12 @@ jobs:
           else
             echo "Native project folder not found after extraction"; find . -maxdepth 3 -type f; exit 1
           fi
+      - name: Inspect C++ source
+        run: |
+          echo "=== main.cpp lines 1-145 ==="
+          nl -ba "$PROJECT_DIR/src/main.cpp" | sed -n '1,145p'
+          echo "=== Raylib declaration ==="
+          grep -R "DrawRectangleRoundedLines" "$ANDROID_HOME" 2>/dev/null | head -5 || true
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
