@@ -18,3 +18,5 @@ Une fois les sources présentes à la racine du dépôt, le workflow Android pou
 
 
 Android APK build trigger: updated for native C++ build.
+
+Build retry after Android SDK setup fix.
