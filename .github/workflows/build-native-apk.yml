@@ -37,12 +37,30 @@ jobs:
           else
             echo "Native project folder not found after extraction"; find . -maxdepth 3 -type f; exit 1
           fi
+      - name: Patch C++ compatibility errors
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("BuggyRush_CPP/src/main.cpp")
+          if not p.exists():
+              p = Path("native-project/src/main.cpp")
+          if not p.exists():
+              p = Path("BuggyRush_CPP/BuggyRush_CPP/src/main.cpp")
+          s = p.read_text()
+          s = s.replace("constexpr float PI=3.14159265358979323846f;", "constexpr float GAME_PI=3.14159265358979323846f;")
+          s = s.replace("DrawRectangleRoundedLines(r,.28f,8,2,WHITE);", "DrawRectangleLinesEx(r,2.0f,WHITE);")
+          old = 'drawButton({18,sh-112,78,78},"<",DARKBLUE);drawButton({106,sh-112,78,78},">",DARKBLUE);drawButton({sw-112,sh-112,94,78},"GAZ",DARKGREEN);drawButton({sw-220,sh-105,88,65},"TURBO",ORANGE);drawButton({sw-112,sh-202,94,70},"FREIN",MAROON);'
+          new = 'drawButton(Rectangle{18.0f,(float)(sh-112),78.0f,78.0f},"<",DARKBLUE);drawButton(Rectangle{106.0f,(float)(sh-112),78.0f,78.0f},">",DARKBLUE);drawButton(Rectangle{(float)(sw-112),(float)(sh-112),94.0f,78.0f},"GAZ",DARKGREEN);drawButton(Rectangle{(float)(sw-220),(float)(sh-105),88.0f,65.0f},"TURBO",ORANGE);drawButton(Rectangle{(float)(sw-112),(float)(sh-202),94.0f,70.0f},"FREIN",MAROON);'
+          if old not in s:
+              raise SystemExit("Touch-control line not found; source differs from expected version")
+          s = s.replace(old, new)
+          p.write_text(s)
+          print("Patched:", p)
+          PY
       - name: Inspect C++ source
         run: |
-          echo "=== main.cpp lines 1-145 ==="
-          nl -ba "$PROJECT_DIR/src/main.cpp" | sed -n '1,145p'
-          echo "=== Raylib declaration ==="
-          grep -R "DrawRectangleRoundedLines" "$ANDROID_HOME" 2>/dev/null | head -5 || true
+          echo "=== patched source ==="
+          sed -n '1,15p;48,52p;124,128p' "$PROJECT_DIR/src/main.cpp"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
