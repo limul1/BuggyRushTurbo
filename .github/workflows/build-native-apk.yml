@@ -37,6 +37,23 @@ jobs:
           else
             echo "Native project folder not found after extraction"; find . -maxdepth 3 -type f; exit 1
           fi
+      - name: Fix Android SDK compatibility
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          files = list(Path('.').glob('**/app/build.gradle')) + list(Path('.').glob('**/app/build.gradle.kts'))
+          if not files:
+              raise SystemExit('app/build.gradle not found')
+          for p in files:
+              s = p.read_text()
+              # Android 10 is API 29: keep minimum SDK installable there and target a modern-enough API.
+              s, nmin = re.subn(r'((?:minSdkVersion|minSdk)\\s*(?:=)?\\s*)\\d+', r'\\g<1>23', s)
+              s, ntarget = re.subn(r'((?:targetSdkVersion|targetSdk)\\s*(?:=)?\\s*)\\d+', r'\\g<1>29', s)
+              p.write_text(s)
+              print(f'{p}: minSdk replacements={nmin}, targetSdk replacements={ntarget}')
+              print(''.join(line for line in s.splitlines(True) if 'Sdk' in line or 'sdk' in line))
+          PY
       - name: Patch C++ compatibility errors
         run: |
           python3 - <<'PY'
