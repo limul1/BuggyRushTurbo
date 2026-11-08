@@ -3,7 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'BuggyRush_CPP_Natif_Prototype.zip'
+      - 'BuggyRush_CPP.zip'
+      - 'BuggyRush_Android_Build_Package.zip'
   workflow_dispatch:
 jobs:
   build:
@@ -19,9 +20,19 @@ jobs:
         run: sdkmanager 'ndk;27.2.12479018' 'cmake;3.22.1' 'platforms;android-35' 'build-tools;35.0.0'
       - name: Extract native project
         run: |
-          unzip -o BuggyRush_CPP_Natif_Prototype.zip
-          cd BuggyRush_CPP
-          echo "PROJECT_DIR=$GITHUB_WORKSPACE/BuggyRush_CPP" >> $GITHUB_ENV
+          if [ -f BuggyRush_CPP.zip ]; then
+            unzip -o BuggyRush_CPP.zip
+          else
+            unzip -o BuggyRush_Android_Build_Package.zip
+          fi
+          if [ -d BuggyRush_CPP/BuggyRush_CPP ]; then
+            mv BuggyRush_CPP/BuggyRush_CPP ./native-project
+            echo "PROJECT_DIR=$GITHUB_WORKSPACE/native-project" >> $GITHUB_ENV
+          elif [ -d BuggyRush_CPP ]; then
+            echo "PROJECT_DIR=$GITHUB_WORKSPACE/BuggyRush_CPP" >> $GITHUB_ENV
+          else
+            echo "Native project folder not found after extraction"; find . -maxdepth 3 -type f; exit 1
+          fi
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
@@ -31,5 +42,5 @@ jobs:
         if: always()
         with:
           name: BuggyRush-debug-apk
-          path: BuggyRush_CPP/app/build/outputs/apk/debug/app-debug.apk
+          path: '**/app/build/outputs/apk/debug/app-debug.apk'
           if-no-files-found: warn
