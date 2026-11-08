@@ -15,3 +15,6 @@ Le paquet de travail préparé précédemment contient les sources C++, les fich
 ## Compilation
 
 Une fois les sources présentes à la racine du dépôt, le workflow Android pourra être lancé depuis l'onglet **Actions**. Le fichier APK de débogage sera alors fourni comme artefact si la compilation réussit.
+
+
+Android APK build trigger: updated for native C++ build.
