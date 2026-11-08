@@ -5,6 +5,7 @@ on:
     paths:
       - 'BuggyRush_CPP.zip'
       - 'BuggyRush_Android_Build_Package.zip'
+      - 'README.md'
   workflow_dispatch:
 jobs:
   build:
