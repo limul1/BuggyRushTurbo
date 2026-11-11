@@ -1,0 +1,32 @@
+name: Build Buggy Rush APK from uploaded project
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'BuggyRush_APK_Project.zip'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Extract Android project
+        run: unzip -o BuggyRush_APK_Project.zip
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Build APK
+        working-directory: BuggyRush_APK_Project
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Buggy-Rush-Turbo-APK
+          path: BuggyRush_APK_Project/app/build/outputs/apk/debug/app-debug.apk
