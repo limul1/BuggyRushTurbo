@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'BuggyRush_v131_IconRefresh.zip'
+      - 'BuggyRush_v131_BlueIcon_Project.zip'
       - '.github/workflows/build-from-zip.yml'
   workflow_dispatch:
 permissions:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Extract Android project
-        run: unzip -o BuggyRush_v131_IconRefresh.zip
+        run: unzip -o BuggyRush_v131_BlueIcon_Project.zip
       - name: Raise Android target SDK for modern Android protection rules
         run: sed -i 's/targetSdk 28/targetSdk 35/' BuggyRush_APK_Project/app/build.gradle
       - name: Set up JDK 17
@@ -35,5 +35,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Buggy-Rush-v131-New-Icon-APK
+          name: Buggy-Rush-v131-Blue-Icon-APK
           path: BuggyRush_APK_Project/app/build/outputs/apk/debug/app-debug.apk
