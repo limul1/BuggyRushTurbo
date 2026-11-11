@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'BuggyRush_APK_Project.zip'
+      - '.github/workflows/build-from-zip.yml'
   workflow_dispatch:
 permissions:
   contents: read
