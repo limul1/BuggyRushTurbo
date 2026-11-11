@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Extract Android project
         run: unzip -o BuggyRush_APK_Project.zip
+      - name: Raise Android target SDK for modern Android protection rules
+        run: sed -i 's/targetSdk 28/targetSdk 35/' BuggyRush_APK_Project/app/build.gradle
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
